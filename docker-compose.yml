@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: skillnscale
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@db:5432/skillnscale
+      - SECRET_KEY=dev-secret-key-change-in-production-abc123xyz
+      - STRIPE_SECRET_KEY=sk_test_mock_secret_key
+      - STRIPE_PUBLISHABLE_KEY=pk_test_mock_publishable_key
+    volumes:
+      - ./uploads:/app/uploads
+
+volumes:
+  postgres_data:
