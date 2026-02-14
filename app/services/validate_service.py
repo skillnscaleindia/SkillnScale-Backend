@@ -10,7 +10,7 @@ import re
 import json
 import logging
 import httpx
-from typing import Dict, Set, Optional
+from typing import Dict, List, Set, Optional
 
 logger = logging.getLogger(__name__)
 
