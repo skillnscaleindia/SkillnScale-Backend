@@ -10,7 +10,7 @@ import re
 import json
 import logging
 import httpx
-from typing import Dict, Set
+from typing import Dict, Set, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ CATEGORY_NAMES: Dict[str, str] = {
 
 # ── Gemini REST API validation ─────────────────────────────────────
 
-def _validate_with_gemini(category_id: str, description: str) -> dict | None:
+def _validate_with_gemini(category_id: str, description: str) -> Optional[dict]:
     """Call Gemini REST API directly via httpx (sync)."""
     try:
         from app.core.config import settings
