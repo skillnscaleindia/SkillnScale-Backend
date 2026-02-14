@@ -75,19 +75,18 @@ def generate_uuid():
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(String, primary_key=True, default=generate_uuid)
-    email = Column(String, unique=True, nullable=True, index=True)
-    password_hash = Column(String, nullable=False)
-    full_name = Column(String, nullable=False)
-    phone = Column(String, nullable=False, unique=True, index=True)
-    role = Column(String, nullable=False, default=UserRole.CUSTOMER.value)
-    service_category = Column(String, nullable=True)  # For professionals
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    email = Column(String(255), unique=True, nullable=True, index=True)
+    password_hash = Column(String(128), nullable=False)
+    full_name = Column(String(100), nullable=False)
+    phone = Column(String(15), nullable=False, unique=True, index=True)
+    role = Column(String(20), nullable=False, default=UserRole.CUSTOMER.value)
+    service_category = Column(String(50), nullable=True)
     bio = Column(Text, nullable=True)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
-    address = Column(String, nullable=True)
-    profile_photo = Column(String, nullable=True)
-    documents = Column(JSON, default=list)
+    address = Column(String(255), nullable=True)
+    profile_photo = Column(String(500), nullable=True)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -96,7 +95,6 @@ class User(Base):
     availability_slots = relationship("Availability", back_populates="professional")
     sent_messages = relationship("Message", back_populates="sender")
     reviews_received = relationship("Review", back_populates="reviewee", foreign_keys="Review.reviewee_id")
-    reviews_received = relationship("Review", back_populates="reviewee", foreign_keys="Review.reviewee_id")
     reviews_given = relationship("Review", back_populates="reviewer", foreign_keys="Review.reviewer_id")
     device_tokens = relationship("DeviceToken", back_populates="user")
 
@@ -104,11 +102,11 @@ class User(Base):
 class ServiceCategory(Base):
     __tablename__ = "service_categories"
 
-    id = Column(String, primary_key=True, default=generate_uuid)
-    name = Column(String, unique=True, nullable=False)
-    icon = Column(String, nullable=False)
-    color = Column(String, nullable=False)
-    description = Column(Text, nullable=True)
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    name = Column(String(50), unique=True, nullable=False)
+    icon = Column(String(50), nullable=False)
+    color = Column(String(20), nullable=False)
+    description = Column(String(255), nullable=True)
 
     # Relationships
     service_requests = relationship("ServiceRequest", back_populates="category")
@@ -117,18 +115,18 @@ class ServiceCategory(Base):
 class ServiceRequest(Base):
     __tablename__ = "service_requests"
 
-    id = Column(String, primary_key=True, default=generate_uuid)
-    customer_id = Column(String, ForeignKey("users.id"), nullable=False)
-    category_id = Column(String, ForeignKey("service_categories.id"), nullable=False)
-    title = Column(String, nullable=False)
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    customer_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    category_id = Column(String(36), ForeignKey("service_categories.id"), nullable=False)
+    title = Column(String(100), nullable=False)
     description = Column(Text, nullable=False)
-    photos = Column(JSON, default=list)  # List of photo URLs
-    location = Column(String, nullable=False)
+    photos = Column(JSON, default=list)
+    location = Column(String(255), nullable=False)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     scheduled_at = Column(DateTime, nullable=True)
-    urgency = Column(String, default=RequestUrgency.IMMEDIATE.value)
-    status = Column(String, default=RequestStatus.OPEN.value)
+    urgency = Column(String(20), default=RequestUrgency.IMMEDIATE.value)
+    status = Column(String(20), default=RequestStatus.OPEN.value)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -142,13 +140,13 @@ class ServiceRequest(Base):
 class Availability(Base):
     __tablename__ = "availability"
 
-    id = Column(String, primary_key=True, default=generate_uuid)
-    professional_id = Column(String, ForeignKey("users.id"), nullable=False)
-    date = Column(String, nullable=False)  # YYYY-MM-DD format
-    start_time = Column(String, nullable=False)  # HH:MM format
-    end_time = Column(String, nullable=False)  # HH:MM format
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    professional_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    date = Column(String(10), nullable=False)  # YYYY-MM-DD
+    start_time = Column(String(5), nullable=False)  # HH:MM
+    end_time = Column(String(5), nullable=False)  # HH:MM
     is_recurring = Column(Boolean, default=False)
-    recurrence_pattern = Column(String, nullable=True)  # daily, weekly, weekdays
+    recurrence_pattern = Column(String(20), nullable=True)
     is_booked = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -159,11 +157,11 @@ class Availability(Base):
 class ChatRoom(Base):
     __tablename__ = "chat_rooms"
 
-    id = Column(String, primary_key=True, default=generate_uuid)
-    request_id = Column(String, ForeignKey("service_requests.id"), nullable=False)
-    customer_id = Column(String, ForeignKey("users.id"), nullable=False)
-    professional_id = Column(String, ForeignKey("users.id"), nullable=False)
-    status = Column(String, default=ChatRoomStatus.ACTIVE.value)
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    request_id = Column(String(36), ForeignKey("service_requests.id"), nullable=False)
+    customer_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    professional_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    status = Column(String(20), default=ChatRoomStatus.ACTIVE.value)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -176,13 +174,13 @@ class ChatRoom(Base):
 class Message(Base):
     __tablename__ = "messages"
 
-    id = Column(String, primary_key=True, default=generate_uuid)
-    chat_room_id = Column(String, ForeignKey("chat_rooms.id"), nullable=False)
-    sender_id = Column(String, ForeignKey("users.id"), nullable=False)
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    chat_room_id = Column(String(36), ForeignKey("chat_rooms.id"), nullable=False)
+    sender_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     content = Column(Text, nullable=False)
-    message_type = Column(String, default=MessageType.TEXT.value)
-    proposed_price = Column(Float, nullable=True)  # Only for price_proposal type
-    media_url = Column(String, nullable=True)
+    message_type = Column(String(20), default=MessageType.TEXT.value)
+    proposed_price = Column(Float, nullable=True)
+    media_url = Column(String(500), nullable=True)
     duration = Column(Float, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -194,12 +192,12 @@ class Message(Base):
 class Review(Base):
     __tablename__ = "reviews"
 
-    id = Column(String, primary_key=True, default=generate_uuid)
-    booking_id = Column(String, ForeignKey("bookings.id"), nullable=False, unique=True)
-    reviewer_id = Column(String, ForeignKey("users.id"), nullable=False)
-    reviewee_id = Column(String, ForeignKey("users.id"), nullable=False)
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    booking_id = Column(String(36), ForeignKey("bookings.id"), nullable=False, unique=True)
+    reviewer_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    reviewee_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     rating = Column(Integer, nullable=False)
-    comment = Column(Text, nullable=True)
+    comment = Column(String(500), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -211,12 +209,12 @@ class Review(Base):
 class Booking(Base):
     __tablename__ = "bookings"
 
-    id = Column(String, primary_key=True, default=generate_uuid)
-    request_id = Column(String, ForeignKey("service_requests.id"), nullable=False)
-    customer_id = Column(String, ForeignKey("users.id"), nullable=False)
-    professional_id = Column(String, ForeignKey("users.id"), nullable=True)
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    request_id = Column(String(36), ForeignKey("service_requests.id"), nullable=False)
+    customer_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    professional_id = Column(String(36), ForeignKey("users.id"), nullable=True)
     agreed_price = Column(Float, default=0.0)
-    status = Column(String, default=BookingStatus.CONFIRMED.value)
+    status = Column(String(20), default=BookingStatus.CONFIRMED.value)
     scheduled_at = Column(DateTime, nullable=True)
     completed_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -233,10 +231,10 @@ class Booking(Base):
 class DeviceToken(Base):
     __tablename__ = "device_tokens"
 
-    id = Column(String, primary_key=True, default=generate_uuid)
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
-    token = Column(String, nullable=False, unique=True)
-    platform = Column(String, nullable=False)  # android, ios, web
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    token = Column(String(255), nullable=False, unique=True)
+    platform = Column(String(10), nullable=False)  # android, ios, web
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -247,12 +245,12 @@ class DeviceToken(Base):
 class Payment(Base):
     __tablename__ = "payments"
 
-    id = Column(String, primary_key=True, default=generate_uuid)
-    booking_id = Column(String, ForeignKey("bookings.id"), nullable=False, unique=True)
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    booking_id = Column(String(36), ForeignKey("bookings.id"), nullable=False, unique=True)
     amount = Column(Float, nullable=False)
-    currency = Column(String, default="inr")
-    status = Column(String, default=PaymentStatus.PENDING.value)
-    stripe_payment_intent_id = Column(String, nullable=True)
+    currency = Column(String(3), default="inr")
+    status = Column(String(20), default=PaymentStatus.PENDING.value)
+    stripe_payment_intent_id = Column(String(100), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -263,8 +261,8 @@ class Payment(Base):
 class OTPVerification(Base):
     __tablename__ = "otp_verifications"
 
-    id = Column(String, primary_key=True, default=generate_uuid)
-    phone = Column(String, nullable=False, index=True)
-    otp_code = Column(String, nullable=False)
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    phone = Column(String(15), nullable=False, index=True)
+    otp_code = Column(String(6), nullable=False)
     expires_at = Column(DateTime, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
