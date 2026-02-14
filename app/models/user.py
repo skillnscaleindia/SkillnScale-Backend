@@ -13,7 +13,7 @@ class TokenData(BaseModel):
 
 # User Schemas
 class UserBase(BaseModel):
-    email: EmailStr
+    email: Optional[EmailStr] = None
     full_name: Optional[str] = None
     role: str = "customer"
     profile_photo: Optional[str] = None
@@ -21,12 +21,28 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
-    phone: Optional[str] = None
+    phone: str
     service_category: Optional[str] = None
 
-class UserLogin(BaseModel):
-    email: EmailStr
+class CustomerCreate(BaseModel):
+    phone: str
     password: str
+    full_name: str
+    email: Optional[EmailStr] = None
+    delivery_method: str = "sms"  # "sms" or "whatsapp"
+
+class ProfessionalCreate(BaseModel):
+    phone: str
+    password: str
+    full_name: str
+    service_category: str
+    email: Optional[EmailStr] = None
+    bio: Optional[str] = None
+    delivery_method: str = "sms"  # "sms" or "whatsapp"
+
+class OTPVerify(BaseModel):
+    phone: str
+    otp_code: str
 
 class UserResponse(UserBase):
     id: str
@@ -39,6 +55,14 @@ class UserResponse(UserBase):
 
     class Config:
         from_attributes = True
+
+class AuthResponse(BaseModel):
+    user: UserResponse
+    tokens: Token
+
+class UserLogin(BaseModel):
+    email: str  # Generic identifier (email or phone)
+    password: str
 
 class UserUpdate(BaseModel):
     full_name: Optional[str] = None

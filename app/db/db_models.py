@@ -76,10 +76,10 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(String, primary_key=True, default=generate_uuid)
-    email = Column(String, unique=True, nullable=False, index=True)
+    email = Column(String, unique=True, nullable=True, index=True)
     password_hash = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
-    phone = Column(String, nullable=True)
+    phone = Column(String, nullable=False, unique=True, index=True)
     role = Column(String, nullable=False, default=UserRole.CUSTOMER.value)
     service_category = Column(String, nullable=True)  # For professionals
     bio = Column(Text, nullable=True)
@@ -258,3 +258,13 @@ class Payment(Base):
 
     # Relationships
     booking = relationship("Booking", back_populates="payment")
+
+
+class OTPVerification(Base):
+    __tablename__ = "otp_verifications"
+
+    id = Column(String, primary_key=True, default=generate_uuid)
+    phone = Column(String, nullable=False, index=True)
+    otp_code = Column(String, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
