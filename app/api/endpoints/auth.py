@@ -1,7 +1,5 @@
-from datetime import timedelta
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status, Body
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.core import security
@@ -30,44 +28,22 @@ def _get_auth_response(user: User) -> AuthResponse:
     )
 
 
-@router.post("/login", response_model=Token)
-async def login_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: AsyncSession = Depends(get_db),
-) -> Any:
-    """OAuth2 compatible token login, get an access token for future requests."""
-    result = await db.execute(select(User).where(User.email == form_data.username))
-    user = result.scalar_one_or_none()
-
-    if not user or not security.verify_password(form_data.password, user.password_hash):
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
-
-    return {
-        "access_token": security.create_access_token(user.id),
-        "refresh_token": security.create_refresh_token(user.id),
-        "token_type": "bearer",
-    }
-
-
 @router.post("/login/json", response_model=Token)
 async def login_json(
     user_in: UserLogin,
     db: AsyncSession = Depends(get_db),
 ) -> Any:
-    """JSON based login for Flutter Mobile (supports email or phone)."""
-    from sqlalchemy import or_
+    """JSON login – phone + password."""
     result = await db.execute(
-        select(User).where(
-            or_(
-                User.email == user_in.email,
-                User.phone == user_in.email  # user_in.email field used as generic login id
-            )
-        )
+        select(User).where(User.phone == user_in.phone)
     )
     user = result.scalar_one_or_none()
 
     if not user or not security.verify_password(user_in.password, user.password_hash):
-        raise HTTPException(status_code=400, detail="Incorrect login credentials")
+        raise HTTPException(status_code=400, detail="Incorrect phone number or password")
+
+    if not user.is_active:
+        raise HTTPException(status_code=400, detail="Account not verified. Please complete OTP verification.")
 
     return {
         "access_token": security.create_access_token(user.id),
@@ -122,16 +98,16 @@ async def signup_customer(
     db: AsyncSession = Depends(get_db),
 ) -> Any:
     """Create new customer user (inactive) and send OTP."""
-    from sqlalchemy import or_
-    query = select(User).where(or_(User.phone == user_in.phone, User.email == user_in.email))
-    result = await db.execute(query)
-    existing_users = result.scalars().all()
-    if existing_users:
-        if any(u.phone == user_in.phone for u in existing_users):
-            detail = "The user with this phone number already exists."
-        else:
-            detail = "The user with this email already exists."
-        raise HTTPException(status_code=400, detail=detail)
+    # Check phone uniqueness
+    result = await db.execute(select(User).where(User.phone == user_in.phone))
+    if result.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="This phone number is already registered.")
+
+    # Check email uniqueness only if provided
+    if user_in.email:
+        result = await db.execute(select(User).where(User.email == user_in.email))
+        if result.scalar_one_or_none():
+            raise HTTPException(status_code=400, detail="This email is already registered.")
 
     new_user = User(
         phone=user_in.phone,
@@ -155,16 +131,16 @@ async def signup_professional(
     db: AsyncSession = Depends(get_db),
 ) -> Any:
     """Create new professional user (inactive) and send OTP."""
-    from sqlalchemy import or_
-    query = select(User).where(or_(User.phone == user_in.phone, User.email == user_in.email))
-    result = await db.execute(query)
-    existing_users = result.scalars().all()
-    if existing_users:
-        if any(u.phone == user_in.phone for u in existing_users):
-            detail = "The user with this phone number already exists."
-        else:
-            detail = "The user with this email already exists."
-        raise HTTPException(status_code=400, detail=detail)
+    # Check phone uniqueness
+    result = await db.execute(select(User).where(User.phone == user_in.phone))
+    if result.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="This phone number is already registered.")
+
+    # Check email uniqueness only if provided
+    if user_in.email:
+        result = await db.execute(select(User).where(User.email == user_in.email))
+        if result.scalar_one_or_none():
+            raise HTTPException(status_code=400, detail="This email is already registered.")
 
     new_user = User(
         phone=user_in.phone,

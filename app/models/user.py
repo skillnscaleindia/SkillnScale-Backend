@@ -61,7 +61,7 @@ class AuthResponse(BaseModel):
     tokens: Token
 
 class UserLogin(BaseModel):
-    email: str  # Generic identifier (email or phone)
+    phone: str
     password: str
 
 class UserUpdate(BaseModel):
