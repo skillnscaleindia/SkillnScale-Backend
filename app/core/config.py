@@ -25,9 +25,6 @@ class Settings(BaseSettings):
     STRIPE_SECRET_KEY: str = "sk_test_placeholder"
     STRIPE_PUBLISHABLE_KEY: str = "pk_test_placeholder"
 
-    # Gemini AI
-    GEMINI_API_KEY: str = ""
-
     # CORS
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
         "http://localhost",
