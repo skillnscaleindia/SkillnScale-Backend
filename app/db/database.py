@@ -1,11 +1,14 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from app.core.config import settings
 
+import ssl as _ssl
+
 engine = create_async_engine(
     settings.DATABASE_URL,
-    # PostgreSQL configuration
-    pool_size=20,
-    max_overflow=10,
+    pool_size=5,
+    max_overflow=5,
+    # Neon requires SSL; ignore locally
+    connect_args={"ssl": "require"} if "neon.tech" in settings.DATABASE_URL else {},
 )
 
 AsyncSessionLocal = async_sessionmaker(

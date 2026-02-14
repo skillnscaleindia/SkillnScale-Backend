@@ -174,7 +174,7 @@ async def get_matched_professionals(
             select(func.count(Availability.id)).where(
                 and_(
                     Availability.professional_id == pro.id,
-                    Availability.is_available == True,
+                    Availability.is_booked == False,
                 )
             )
         )

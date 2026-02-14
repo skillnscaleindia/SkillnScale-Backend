@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: skillnscale-api
+    runtime: docker
+    repo: https://github.com/skillnscaleindia/SkillnScale-Backend
+    branch: main
+    plan: free
+    region: singapore
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
