@@ -2,15 +2,27 @@ from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
+from pydantic import BaseModel
 from app.models.booking import ServiceRequestCreate, ServiceRequestResponse, ServiceRequestUpdate
 from app.models.user import ProProfile
 from app.api import deps
 from app.db.database import get_db
 from app.db.db_models import User, ServiceRequest, Availability, Review, Booking
+from app.services.validate_service import validate_service_description
 from sqlalchemy import func
 
 router = APIRouter()
 
+
+class DescriptionValidation(BaseModel):
+    category_id: str
+    description: str
+
+
+@router.post("/validate-description")
+async def validate_description(data: DescriptionValidation) -> Any:
+    """Validate whether a service description is relevant to the category."""
+    return validate_service_description(data.category_id, data.description)
 
 @router.post("/", response_model=ServiceRequestResponse)
 async def create_service_request(
