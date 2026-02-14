@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15  # 15 minutes
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7  # 7 days
     # Cloudinary
     CLOUDINARY_CLOUD_NAME: str = "dwcm6rqyx"
     CLOUDINARY_API_KEY: str = "998782166913584"
