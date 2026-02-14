@@ -15,11 +15,10 @@ class Settings(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15  # 15 minutes
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 30    # 30 days
-
-    # Stripe
-    STRIPE_SECRET_KEY: str = "sk_test_mock_secret_key"
-    STRIPE_PUBLISHABLE_KEY: str = "pk_test_mock_publishable_key"
+    # Cloudinary
+    CLOUDINARY_CLOUD_NAME: str = "dwcm6rqyx"
+    CLOUDINARY_API_KEY: str = "998782166913584"
+    CLOUDINARY_API_SECRET: str = "vg3JZF0_69vtRLpRvPKxs0vY5t8"
 
     # CORS
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [

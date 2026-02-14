@@ -10,5 +10,9 @@ services:
     envVars:
       - key: DATABASE_URL
         sync: false
-      - key: SECRET_KEY
-        generateValue: true
+      - key: CLOUDINARY_CLOUD_NAME
+        value: dwcm6rqyx
+      - key: CLOUDINARY_API_KEY
+        value: 998782166913584
+      - key: CLOUDINARY_API_SECRET
+        value: vg3JZF0_69vtRLpRvPKxs0vY5t8
