@@ -4,7 +4,7 @@ from app.core.config import settings
 import ssl as _ssl
 
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://").replace("postgres://", "postgresql+asyncpg://"),
     pool_size=5,
     max_overflow=5,
     # Neon requires SSL; ignore locally
