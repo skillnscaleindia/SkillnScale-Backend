@@ -8,3 +8,4 @@ backend.log
 uploads/
 scripts/
 .agent/
+.neon
