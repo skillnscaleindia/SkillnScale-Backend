@@ -1,13 +1,21 @@
 import logging
 from typing import List, Dict, Optional
-import firebase_admin
-from firebase_admin import messaging, credentials
+
+try:
+    import firebase_admin
+    from firebase_admin import messaging, credentials
+    _firebase_available = True
+except ImportError:
+    _firebase_available = False
 
 logger = logging.getLogger(__name__)
 
 class NotificationService:
     def __init__(self):
         self.initialized = False
+        if not _firebase_available:
+            logger.info("firebase-admin not installed. Push notifications will be mocked.")
+            return
         try:
             # Check if already initialized (to avoid errors on reload)
             if not firebase_admin._apps:
