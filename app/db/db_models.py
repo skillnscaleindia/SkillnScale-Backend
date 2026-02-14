@@ -116,8 +116,8 @@ class ServiceRequest(Base):
     __tablename__ = "service_requests"
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
-    customer_id = Column(String(36), ForeignKey("users.id"), nullable=False)
-    category_id = Column(String(36), ForeignKey("service_categories.id"), nullable=False)
+    customer_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    category_id = Column(String(36), ForeignKey("service_categories.id"), nullable=False, index=True)
     title = Column(String(100), nullable=False)
     description = Column(Text, nullable=False)
     photos = Column(JSON, default=list)
@@ -126,7 +126,7 @@ class ServiceRequest(Base):
     longitude = Column(Float, nullable=True)
     scheduled_at = Column(DateTime, nullable=True)
     urgency = Column(String(20), default=RequestUrgency.IMMEDIATE.value)
-    status = Column(String(20), default=RequestStatus.OPEN.value)
+    status = Column(String(20), default=RequestStatus.OPEN.value, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -158,9 +158,9 @@ class ChatRoom(Base):
     __tablename__ = "chat_rooms"
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
-    request_id = Column(String(36), ForeignKey("service_requests.id"), nullable=False)
-    customer_id = Column(String(36), ForeignKey("users.id"), nullable=False)
-    professional_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    request_id = Column(String(36), ForeignKey("service_requests.id"), nullable=False, index=True)
+    customer_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    professional_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
     status = Column(String(20), default=ChatRoomStatus.ACTIVE.value)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -175,7 +175,7 @@ class Message(Base):
     __tablename__ = "messages"
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
-    chat_room_id = Column(String(36), ForeignKey("chat_rooms.id"), nullable=False)
+    chat_room_id = Column(String(36), ForeignKey("chat_rooms.id"), nullable=False, index=True)
     sender_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     content = Column(Text, nullable=False)
     message_type = Column(String(20), default=MessageType.TEXT.value)
@@ -210,11 +210,11 @@ class Booking(Base):
     __tablename__ = "bookings"
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
-    request_id = Column(String(36), ForeignKey("service_requests.id"), nullable=False)
-    customer_id = Column(String(36), ForeignKey("users.id"), nullable=False)
-    professional_id = Column(String(36), ForeignKey("users.id"), nullable=True)
+    request_id = Column(String(36), ForeignKey("service_requests.id"), nullable=False, index=True)
+    customer_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    professional_id = Column(String(36), ForeignKey("users.id"), nullable=True, index=True)
     agreed_price = Column(Float, default=0.0)
-    status = Column(String(20), default=BookingStatus.CONFIRMED.value)
+    status = Column(String(20), default=BookingStatus.CONFIRMED.value, index=True)
     scheduled_at = Column(DateTime, nullable=True)
     completed_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

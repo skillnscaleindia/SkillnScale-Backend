@@ -20,7 +20,7 @@ COPY . .
 RUN mkdir -p uploads/docs
 
 # Expose port
-EXPOSE 8000
+EXPOSE 10000
 
 # Run command
-CMD ["gunicorn", "app.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000"]
+CMD ["gunicorn", "app.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:10000"]
