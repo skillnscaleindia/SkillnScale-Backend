@@ -6,3 +6,5 @@ __pycache__/
 *.db
 backend.log
 uploads/
+scripts/
+.agent/
