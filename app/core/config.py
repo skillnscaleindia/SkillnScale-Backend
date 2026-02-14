@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     CLOUDINARY_API_KEY: str = "998782166913584"
     CLOUDINARY_API_SECRET: str = "vg3JZF0_69vtRLpRvPKxs0vY5t8"
 
+    # Stripe
+    STRIPE_SECRET_KEY: str = "sk_test_placeholder"
+    STRIPE_PUBLISHABLE_KEY: str = "pk_test_placeholder"
+
     # CORS
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
         "http://localhost",

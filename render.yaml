@@ -16,3 +16,7 @@ services:
         value: 998782166913584
       - key: CLOUDINARY_API_SECRET
         value: vg3JZF0_69vtRLpRvPKxs0vY5t8
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
