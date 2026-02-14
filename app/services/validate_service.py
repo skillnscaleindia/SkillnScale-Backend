@@ -38,8 +38,11 @@ def _validate_with_gemini(category_id: str, description: str) -> Optional[dict]:
         from app.core.config import settings
         api_key = settings.GEMINI_API_KEY
         if not api_key:
+            logger.info("GEMINI_API_KEY is empty, using keyword fallback")
             return None
-    except Exception:
+        logger.info(f"Calling Gemini API for category={category_id}")
+    except Exception as e:
+        logger.warning(f"Failed to load GEMINI_API_KEY: {e}")
         return None
 
     category_name = CATEGORY_NAMES.get(category_id, category_id)
@@ -152,7 +155,7 @@ GENERIC_KEYWORDS: Set[str] = {
 MIN_WORDS = 3
 
 
-def _tokenize(text: str) -> list[str]:
+def _tokenize(text: str) -> List[str]:
     return re.findall(r"[a-zA-Z]+", text.lower())
 
 
@@ -182,12 +185,15 @@ def _validate_with_keywords(category_id: str, description: str) -> dict:
 
     token_set = set(tokens)
     cat_keywords = CATEGORY_KEYWORDS.get(category_id, set())
-    total = len(token_set & cat_keywords) + len(token_set & GENERIC_KEYWORDS)
+    cat_matches = token_set & cat_keywords
+    generic_matches = token_set & GENERIC_KEYWORDS
 
-    if total == 0:
+    # Must have at least one category-specific keyword
+    if len(cat_matches) == 0:
+        category_name = CATEGORY_NAMES.get(category_id, category_id)
         return {
             "is_valid": False,
-            "message": "This doesn't seem related to the service.",
+            "message": f"This doesn't seem related to {category_name}. Please describe a specific {category_name.lower()} issue.",
             "suggestion": _example_for(category_id),
         }
 
