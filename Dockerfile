@@ -23,4 +23,4 @@ RUN mkdir -p uploads/docs
 EXPOSE 10000
 
 # Run command
-CMD ["gunicorn", "app.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:10000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000"]
